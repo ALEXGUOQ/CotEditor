@@ -1,4 +1,4 @@
-/*
+	/*
  ==============================================================================
  CEDocumentController
  
@@ -32,7 +32,7 @@
 #import "CEEncodingManager.h"
 #import "CEByteCountTransformer.h"
 #import "constants.h"
-
+#import "CEOpenFilePath.h"
 
 @interface CEDocumentController ()
 
@@ -45,6 +45,7 @@
 // readonly
 @property (nonatomic, readwrite) NSStringEncoding accessorySelectedEncoding;
 
+@property (nonatomic, strong) CEOpenFilePath *lastOpenFilePath;
 @end
 
 
@@ -99,7 +100,25 @@
         }
     }
     
-    return [super makeDocumentWithContentsOfURL:url ofType:typeName error:nil];
+    CEDocument *document = [super makeDocumentWithContentsOfURL:url ofType:typeName error:nil];
+    document.openPath = self.lastOpenFilePath;
+    self.lastOpenFilePath = nil;
+    
+    return document;
+}
+
+-(void)openDocumentWithContentsOfURL:(NSURL *)url display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument *, BOOL, NSError *))completionHandler {
+
+    CEOpenFilePath *path = [CEOpenFilePath openFilePathWithUrl:url];
+    
+    if (path.containsPosition) {
+        //Save current path to lastOpenFilePath. Assign it to document object later.
+        //The document making happens just in openDocumentWithContentsOfURL:display:completionHandler: method. So there is no worry about threads.
+        self.lastOpenFilePath = path;
+        [super openDocumentWithContentsOfURL:path.fileURL display:displayDocument completionHandler:completionHandler];
+    } else {
+        [super openDocumentWithContentsOfURL:url display:displayDocument completionHandler:completionHandler];
+    }
 }
 
 

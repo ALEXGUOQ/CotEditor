@@ -37,7 +37,7 @@
 
 @class CEEditorWrapper;
 @class CEWindowController;
-
+@class CEOpenFilePath;
 
 // Incompatible chars listController key
 extern NSString *const CEIncompatibleLineNumberKey;
@@ -54,6 +54,7 @@ typedef NS_ENUM(NSUInteger, CEGoToType) {
 @interface CEDocument : NSDocument
 
 @property (nonatomic) CEEditorWrapper *editor;
+@property (nonatomic, strong) CEOpenFilePath *openPath;
 
 // readonly properties
 @property (readonly, nonatomic) CEWindowController *windowController;

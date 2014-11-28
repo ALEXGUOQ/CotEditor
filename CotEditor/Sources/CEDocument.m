@@ -41,7 +41,7 @@
 #import "CEUtils.h"
 #import "NSData+MD5.h"
 #import "constants.h"
-
+#import "CEOpenFilePath.h"
 
 // constants
 static char const XATTR_ENCODING_KEY[] = "com.apple.TextEncoding";
@@ -1078,6 +1078,18 @@ NSString *const CEIncompatibleConvertedCharKey = @"convertedChar";
     if ([notification object] == [[self windowController] window]) {
         // 書き込み禁止アラートを表示
         [self showNotWritableAlert];
+    }
+    
+    //TODO: Need refactor. Extract the location finding method to util class.
+    if (self.openPath) {
+        NSArray *locLen = [self.openPath.positionString componentsSeparatedByString:@":"];
+        
+        if ([locLen count] > 0) {
+            NSInteger location = [locLen[0] integerValue];
+            NSInteger length = ([locLen count] > 1) ? [locLen[1] integerValue] : 0;
+            
+            [self gotoLocation:location length:length type:CEGoToLine];
+        }
     }
 }
 
